@@ -1,0 +1,46 @@
+h2 {
+  margin-top: 25px;
+  font-size: 52px;
+  color: #66fcf1;
+  text-align: center;
+  word-wrap: break-word;
+  margin-bottom: 25px;
+}
+
+.botLable {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 24px;
+  color: #fcfcfd;
+  text-align: center;
+  word-wrap: break-word;
+  margin-top: 15px;
+
+  min-width: 175px;
+}
+
+svg {
+  width: 100px;
+  text-align: center;
+  fill: aqua;
+}
+
+.svgI {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.container {
+  margin-top: 15px;
+  border-bottom: 1px solid aqua;
+  border-top: 1px solid aqua;
+  border-right: 1px solid aqua;
+  border-left: 1px solid aqua;
+  min-width: 700px;
+}
+
+hr {
+  background-color: aqua;
+  height: 3px;
+}

@@ -1,0 +1,43 @@
+/* AppComponent's private CSS styles */
+
+h1 {
+    font-size: 76px;
+    color: #66fcf1;
+    text-align: center;
+    word-wrap: break-word;
+    margin-bottom: 25px;
+  }
+  nav a {
+    padding: 1rem;
+    text-decoration: none;
+    font-weight: 400;
+    margin-left: 10px;
+    margin-right: 10px;
+    display: inline-block;
+    background-color: #0b0c10;
+    color: #fcfcfd;
+    border: 2px solid #66fcf1; 
+    min-width: 120px;
+    text-align: center;
+  }
+  
+  nav a:hover {
+    color: #0b0c10;
+    background-color: #66fcf1;
+  }
+  nav a:active {
+    color: #0b0c10;
+    background-color: #66fcf1;
+  }
+
+  nav{
+    display: flex;
+    justify-content: center;
+  }
+
+  body{
+
+    height: 100%;
+    margin: 0;
+    background-color: #0b0c10;
+  }

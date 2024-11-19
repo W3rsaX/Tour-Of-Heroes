@@ -1,0 +1,113 @@
+tr {
+  color: #fcfcfd;
+  height: 50px;
+  font-size: 24px;
+  border-top: 1px solid aqua;
+  border-bottom: 1px solid aqua;
+  border-right: 1px solid aqua;
+  border-left: 1px solid aqua;
+
+}
+
+.container {
+  position: relative;
+  background: #0b0c10;
+  color: #fcfcfd;
+}
+
+table {
+  width: 100%;
+  border-top: 1px solid aqua;
+  border-bottom: 1px solid aqua;
+  background-color: #0b0c10;
+}
+
+.mat-column-id {
+  width: 20px;
+  text-align: center;
+  border-top: 1px solid aqua;
+  border-bottom: 1px solid aqua;
+  border-right: 1px solid aqua;
+  border-left: 1px solid aqua;
+  color: #fcfcfd;
+  font-size: 24px;
+}
+
+.mat-column-name {
+  border-top: 1px solid aqua;
+  border-bottom: 1px solid aqua;
+  color: #fcfcfd;
+  font-size: 24px;
+}
+
+.mat-column-gender {
+  width: 30px;
+  text-align: center;
+  border-top: 1px solid aqua;
+  border-bottom: 1px solid aqua;
+  border-left: 1px solid aqua;
+  border-right: 1px solid aqua;
+  color: #fcfcfd;
+  font-size: 24px;
+}
+
+.mat-column-power {
+  width: 30px;
+  text-align: center;
+  border-top: 1px solid aqua;
+  border-bottom: 1px solid aqua;
+  border-right: 1px solid aqua;
+  color: #fcfcfd;
+  font-size: 24px;
+}
+
+.mat-column-race {
+  width: 50px;
+  text-align: center;
+  border-top: 1px solid aqua;
+  border-bottom: 1px solid aqua;
+  border-left: 1px solid aqua;
+  border-right: 1px solid aqua;
+  color: #fcfcfd;
+  font-size: 24px;
+}
+
+.mat-column-edit {
+  width: 10px;
+  border-bottom: 1px solid aqua;
+}
+
+.mat-column-delete {
+  width: 10px;
+  border-bottom: 1px solid aqua;
+  border-right: 1px solid aqua;
+  color: black;
+}
+
+.mat-icon {
+  color: #fcfcfd;
+}
+
+.mat-mdc-form-field {
+  font-size: 14px;
+  width: 100%;
+}
+
+.mat-mdc-table {
+  max-height: 150px;
+  overflow: auto;
+}
+
+.buttonSearch{
+  margin-bottom: 20px;
+  margin-right: 20px;
+}
+
+.buttonGet{
+  width: 120px;
+  margin-bottom: 25px;
+}
+
+.getFile{
+  width: 220px;
+}

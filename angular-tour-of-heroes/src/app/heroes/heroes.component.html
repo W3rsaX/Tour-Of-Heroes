@@ -1,0 +1,75 @@
+<div class="container">
+  <form #heroForm="ngForm" (ngSubmit)="saveHero(heroForm)">
+    <mat-form-field appearance="outline">
+      <mat-label>Hero Id</mat-label>
+      <input matInput placeholder="Hero Id" name="heroId" [(ngModel)]="hero.id" disabled>
+      <mat-icon matSuffix>tag</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Hero Name</mat-label>
+      <input type="text" maxlength="24" matInput placeholder="Hero Name" name="heroName" autofocus
+        [(ngModel)]="hero.name" required [formControl]="nameControl">
+      <mat-icon matSuffix>person</mat-icon>
+    </mat-form-field>
+
+    <div class="warning" *ngIf="
+    nameControl.invalid &&
+    (nameControl.touched || nameControl.dirty) && nameControl.hasError('required')">This field is required
+    </div>
+
+    <div class="example-section">
+      <Label>Gender</Label>
+      <mat-radio-group name="radioGender" aria-label="Select an option" [(ngModel)]="gender"
+        [ngModelOptions]="{standalone: true}">
+        <mat-radio-button class="radio" (click)="selectGender('M')" value="M" id="radioButM">M</mat-radio-button>
+        <mat-radio-button class="radio" (click)="selectGender('F')" value="F" id="radioButF">F</mat-radio-button>
+      </mat-radio-group>
+    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Hero Power</mat-label>
+      <input type="number" min="0" max="100" matInput placeholder="Power 0-100" name="heroPower"
+        [(ngModel)]="hero.power" required [formControl]="powerControl" autofocus>
+      <mat-icon matSuffix>format_list_numbered</mat-icon>
+    </mat-form-field>
+
+    <div class="warning" *ngIf="
+    powerControl.invalid &&
+    (powerControl.touched || powerControl.dirty) && powerControl.hasError('required')">This field is required
+    </div>
+
+    <div class="warning" *ngIf="
+    powerControl.invalid &&
+    (powerControl.touched || powerControl.dirty) && powerControl.hasError('max')">
+      Strength from 0 to 100
+    </div>
+
+    <mat-form-field appearance="outline" class="raceClass">
+      <mat-label>Race</mat-label>
+      <mat-select [(ngModel)]="hero.race" [formControl]="raceControl" autofocus>
+        <mat-option value="Human">Human</mat-option>
+        <mat-option value="Dwarf">Dwarf</mat-option>
+        <mat-option value="Elf">Elf</mat-option>ф
+      </mat-select>
+      <mat-icon matSuffix>diversity_3</mat-icon>
+    </mat-form-field>
+
+    <div class="warning" *ngIf="
+    raceControl.invalid &&
+    (raceControl.touched || raceControl.dirty) && raceControl.hasError('required')">This field is required
+    </div>
+
+    <div>
+      <button mat-flat-button>Save hero</button>
+    </div>
+  </form>
+  <div >
+    <button mat-stroked-button (click)="clearForm()">Clear</button>
+  </div>
+  <div #file>
+    <hr>
+    <button  mat-flat-button (click)="uploadFile()" >Upload from file</button>
+    <input #fileInput type="file" class="hidden" (change)="fileUpload($event)" accept=".csv,.json,.xml">
+  </div>
+</div>

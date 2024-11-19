@@ -1,0 +1,58 @@
+h2 {
+  margin-top: 65px;
+  font-size: 52px;
+  color: #66fcf1;
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+a {
+  background-color: #0b0c10;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 550;
+  text-decoration: none;
+  color: #fcfcfd;
+  text-align: center;
+  min-width: 150px;
+  margin: .5rem auto;
+  border-top: 1px solid aqua;
+  border-bottom: 1px solid aqua;
+  border-right: 1px solid aqua;
+  border-left: 1px solid aqua;
+  height: 100%;
+}
+
+
+
+a:hover {
+  background-color: aqua;
+  color: #0b0c10;
+
+}
+
+hr {
+  background-color: aqua;
+  height: 3px;
+}
+
+label {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 24px;
+  color: #66fcf1;
+  text-align: center;
+  word-wrap: break-word;
+  margin-bottom: 15px;
+
+}
+
+.top1 {
+  background-color: red;
+  height: 100%;
+}
+
+.mat-grid-list{
+  background-color: white;
+  height: 100%;
+}

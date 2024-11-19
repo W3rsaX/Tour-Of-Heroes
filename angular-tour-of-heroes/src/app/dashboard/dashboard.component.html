@@ -1,0 +1,34 @@
+<div class="container">
+  <h2>Top 1000 Heroes by race</h2>
+  <hr>
+  <div class="d-flex justify-content-evenly">
+
+    <div class="d-flex flex-column mb-auto">
+      <label>Top 1000 Human</label>
+      <a *ngFor="let hero of heroHuman" routerLink="/detail/{{hero.id}}">
+        {{hero.name}}
+        <hr>
+        {{hero.power}}
+      </a>
+    </div>
+
+    <div class="d-flex flex-column mb-auto">
+      <label>Top 1000 Dwarf</label>
+      <a *ngFor="let hero of heroDwarf" routerLink="/detail/{{hero.id}}">
+        {{hero.name}}
+        <hr>
+        {{hero.power}}
+      </a>
+    </div>
+
+    <div class="d-flex flex-column mb-auto">
+      <label>Top 1000 Elf</label>
+      <a *ngFor="let hero of heroElf" routerLink="/detail/{{hero.id}}">
+        {{hero.name}}
+        <hr>
+        {{hero.power}}
+      </a>
+    </div>
+    
+  </div>
+</div>
