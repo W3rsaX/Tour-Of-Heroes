@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+
 import com.example.demo.dao.HeroDashboardDao;
 import com.example.demo.dao.HeroJsonDao;
 import com.example.demo.model.HeroDashboard;
@@ -25,6 +26,7 @@ import com.example.demo.dao.HeroDao;
 import com.example.demo.model.Hero;
 import org.springframework.web.multipart.MultipartFile;
 import redis.clients.jedis.JedisPooled;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Service
@@ -52,46 +54,65 @@ public class HeroService {
 
     public List<Hero> getHeroes(String sort, String sortType, String filterValue, Integer pageSize, Integer pageIndex) {
         List<Hero> heroes = new ArrayList<>();
+
         if (sortType.equals("asc")) {
             heroes = heroDao.findAllByNameIgnoreCaseContaining(filterValue, PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.ASC, sort)));
         } else {
             heroes = heroDao.findAllByNameIgnoreCaseContaining(filterValue, PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, sort)));
         }
+
         return heroes;
     }
 
     public List<HeroDashboard> getTopHero(String race) throws IOException, ClassNotFoundException {
-        JedisPooled jedis = new JedisPooled("localhost", 6379);
+        final String key = "Top:%s".formatted(race);
         List<HeroDashboard> heroes = new ArrayList<>();
-        String key = "Top:%s".formatted(race);
-        //Забираем данные из Redis
-        if (jedis.get(key.getBytes()) != null) {
-            ByteArrayInputStream bais = new ByteArrayInputStream(jedis.get(key.getBytes()));
-            ObjectInputStream in = new ObjectInputStream(bais);
-            heroes = (List<HeroDashboard>) in.readObject();
-            in.close();
-            return heroes;
+
+        try (JedisPooled jedis = new JedisPooled("localhost", 6379)) {
+            byte[] cachedHeroes = jedis.get(key.getBytes());
+            if (cachedHeroes != null) {
+                try (ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(cachedHeroes))) {
+                    return (List<HeroDashboard>) in.readObject();
+                }
+            }
+
+            heroes = heroDashboardDao.getTopHeroesByRace(race);
+
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                 ObjectOutputStream out = new ObjectOutputStream(baos)) {
+                out.writeObject(heroes);
+                jedis.setex(key.getBytes(), TTL, baos.toByteArray());
+            }
+        } catch (JedisConnectionException e) {
+            System.err.println("Redis connection error : " + e.getMessage());
         }
-        //Данных нет в Redis обращаемся к БД
-        heroes = heroDashboardDao.getTopHeroesByRace(race);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream out = new ObjectOutputStream(baos);
-        out.writeObject(heroes);
-        jedis.setex(key.getBytes(), TTL, baos.toByteArray());
-        out.close();
+
+        if (heroes.isEmpty())
+            heroes = heroDashboardDao.getTopHeroesByRace(race);
+
         return heroes;
     }
 
     public Hero getHero(Long heroId) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        JedisPooled jedis = new JedisPooled("localhost", 6379);
-        String key = "Hero:%d".formatted(heroId);
-        String str = jedis.get(key);
-        if (str != null) {
-            return mapper.readValue(str, Hero.class);
+        final String key = "Hero:%d".formatted(heroId);
+        Hero hero = new Hero();
+
+        try (JedisPooled jedis = new JedisPooled("localhost", 6379)) {
+            String str = jedis.get(key);
+            ObjectMapper mapper = new ObjectMapper();
+
+            if (str != null)
+                return mapper.readValue(str, Hero.class);
+
+            hero = heroDao.findById(heroId).orElseThrow();
+            jedis.setex(key, TTL, mapper.writeValueAsString(hero));
+        } catch (JedisConnectionException e) {
+            System.err.println("Redis connection error : " + e.getMessage());
         }
-        Hero hero = heroDao.findById(heroId).orElseThrow();
-        jedis.setex(key, TTL, mapper.writeValueAsString(hero));
+
+        if (hero == null)
+            hero = heroDao.findById(heroId).orElseThrow();
+
         return hero;
     }
 
@@ -164,15 +185,9 @@ public class HeroService {
     }
 
     public byte[] getJson(String like) throws IOException {
-        Path path = Path.of("HeroesJSON.json");
-        Files.deleteIfExists(path);
-        Files.createFile(path);
-        BufferedWriter writer = Files.newBufferedWriter(path);
         List<HeroJson> heroes = heroJsonDao.findAllByNameIgnoreCaseContaining(like);
         ObjectMapper jacksonMapper = new ObjectMapper();
-        jacksonMapper.writeValue(writer,heroes);
-        writer.close();
-        return Files.readAllBytes(path);
+        return jacksonMapper.writeValueAsBytes(heroes);
     }
 
     public byte[] getXml(String like) throws IOException, JAXBException {
