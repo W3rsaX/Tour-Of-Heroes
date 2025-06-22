@@ -1,10 +1,12 @@
 package com.example.demo.service;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import com.example.demo.dao.HeroDashboardDao;
 import com.example.demo.dao.HeroJsonDao;
@@ -15,15 +17,18 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opencsv.CSVWriter;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import com.example.demo.dao.HeroDao;
 import com.example.demo.model.Hero;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import redis.clients.jedis.JedisPooled;
 import redis.clients.jedis.exceptions.JedisConnectionException;
@@ -48,11 +53,13 @@ public class HeroService {
     @Autowired
     FileParser fileParser;
 
+    @Transactional
     public Hero saveHero(Hero hero) {
         return heroDao.save(hero);
     }
 
-    public List<Hero> getHeroes(String sort, String sortType, String filterValue, Integer pageSize, Integer pageIndex) {
+    @Async
+    public CompletableFuture<List<Hero>> getHeroes(String sort, String sortType, String filterValue, Integer pageSize, Integer pageIndex) {
         List<Hero> heroes = new ArrayList<>();
 
         if (sortType.equals("asc")) {
@@ -61,10 +68,11 @@ public class HeroService {
             heroes = heroDao.findAllByNameIgnoreCaseContaining(filterValue, PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, sort)));
         }
 
-        return heroes;
+        return CompletableFuture.completedFuture(heroes);
     }
 
-    public List<HeroDashboard> getTopHero(String race) throws IOException, ClassNotFoundException {
+    @Async
+    public CompletableFuture<List<HeroDashboard>> getTopHero(String race) throws IOException, ClassNotFoundException {
         final String key = "Top:%s".formatted(race);
         List<HeroDashboard> heroes = new ArrayList<>();
 
@@ -72,7 +80,7 @@ public class HeroService {
             byte[] cachedHeroes = jedis.get(key.getBytes());
             if (cachedHeroes != null) {
                 try (ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(cachedHeroes))) {
-                    return (List<HeroDashboard>) in.readObject();
+                    return CompletableFuture.completedFuture((List<HeroDashboard>) in.readObject());
                 }
             }
 
@@ -90,10 +98,11 @@ public class HeroService {
         if (heroes.isEmpty())
             heroes = heroDashboardDao.getTopHeroesByRace(race);
 
-        return heroes;
+        return CompletableFuture.completedFuture(heroes);
     }
 
-    public Hero getHero(Long heroId) throws JsonProcessingException {
+    @Async
+    public CompletableFuture<Hero> getHero(Long heroId) throws JsonProcessingException {
         final String key = "Hero:%d".formatted(heroId);
         Hero hero = new Hero();
 
@@ -102,7 +111,7 @@ public class HeroService {
             ObjectMapper mapper = new ObjectMapper();
 
             if (str != null)
-                return mapper.readValue(str, Hero.class);
+                return CompletableFuture.completedFuture(mapper.readValue(str, Hero.class));
 
             hero = heroDao.findById(heroId).orElseThrow();
             jedis.setex(key, TTL, mapper.writeValueAsString(hero));
@@ -113,17 +122,20 @@ public class HeroService {
         if (hero == null)
             hero = heroDao.findById(heroId).orElseThrow();
 
-        return hero;
+        return CompletableFuture.completedFuture(hero);
     }
 
-    public Long getLength(String like) {
-        return heroDao.countByNameIgnoreCaseContaining(like);
+    @Async
+    public CompletableFuture<Long> getLength(String like) {
+        return CompletableFuture.completedFuture(heroDao.countByNameIgnoreCaseContaining(like));
     }
 
+    @Transactional
     public void deleteHero(Long heroId) {
         heroDao.deleteById(heroId);
     }
 
+    @Transactional
     public Hero updateHero(Hero hero) {
         heroDao.findById(hero.getId()).orElseThrow();
         return heroDao.save(hero);
@@ -172,16 +184,27 @@ public class HeroService {
 
     public byte[] getCsv(String like) throws IOException {
         List<Hero> heroes = heroDao.findAllByNameIgnoreCaseContaining(like);
-        Path path = Path.of("HeroesCSV.csv");
-        Files.deleteIfExists(path);
-        Files.createFile(path);
-        BufferedWriter writer = Files.newBufferedWriter(path);
-        for (Hero hero : heroes) {
-            String str = "\"" + hero.getName() + "\",\"" + hero.getGender() + "\"," + hero.getPower() + ",\"" + hero.getRace() + "\"\n";
-            writer.append(str);
+
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+             OutputStreamWriter writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
+             CSVWriter csvWriter = new CSVWriter(writer)) {
+
+            String[] header = {"Name", "Gender", "Power", "Race"};
+            csvWriter.writeNext(header);
+
+            for (Hero hero : heroes) {
+                String[] record = {
+                        hero.getName(),
+                        hero.getGender(),
+                        String.valueOf(hero.getPower()),
+                        hero.getRace()
+                };
+                csvWriter.writeNext(record);
+            }
+
+            csvWriter.flush();
+            return outputStream.toByteArray();
         }
-        writer.close();
-        return Files.readAllBytes(path);
     }
 
     public byte[] getJson(String like) throws IOException {
@@ -191,16 +214,21 @@ public class HeroService {
     }
 
     public byte[] getXml(String like) throws IOException, JAXBException {
-        Path path = Path.of("HeroesXML.xml");
-        Files.deleteIfExists(path);
-        Files.createFile(path);
-        BufferedWriter writer = Files.newBufferedWriter(path);
-        Heroes heroesClass = new Heroes();
-        heroesClass.setHeroes(heroDao.findAllByNameIgnoreCaseContaining(like));
-        JAXBContext jaxbContext = JAXBContext.newInstance(Heroes.class);
-        Marshaller marshaller = jaxbContext.createMarshaller();
-        marshaller.marshal(heroesClass, writer);
-        writer.close();
-        return Files.readAllBytes(path);
+        List<Hero> heroes = heroDao.findAllByNameIgnoreCaseContaining(like);
+
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            Heroes heroesClass = new Heroes();
+            heroesClass.setHeroes(heroes);
+
+            JAXBContext jaxbContext = JAXBContext.newInstance(Heroes.class);
+            Marshaller marshaller = jaxbContext.createMarshaller();
+
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
+            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
+
+            marshaller.marshal(heroesClass, outputStream);
+
+            return outputStream.toByteArray();
+        }
     }
 }
