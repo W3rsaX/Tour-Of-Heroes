@@ -2,6 +2,8 @@ package com.example.demo.controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 import com.example.demo.model.HeroDashboard;
 import com.example.demo.service.HeroEditor;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -59,22 +61,22 @@ public class HeroController {
 	}
 
 	@GetMapping("/hero/get")
-	public List<Hero> getHeroes(@RequestParam("Sort") String sort, @RequestParam("SortType") String sortType, @RequestParam("FilterValue") String filterValue, @RequestParam("PageSize") Integer pageSize, @RequestParam("PageIndex") Integer pageIndex) {
+	public CompletableFuture<List<Hero>> getHeroes(@RequestParam("Sort") String sort, @RequestParam("SortType") String sortType, @RequestParam("FilterValue") String filterValue, @RequestParam("PageSize") Integer pageSize, @RequestParam("PageIndex") Integer pageIndex) {
 		return heroService.getHeroes(sort, sortType,filterValue, pageSize, pageIndex);
 	}
 
 	@GetMapping("/hero/get/length")
-	public Long getLength(@RequestParam("Like") String like) {
+	public CompletableFuture<Long> getLength(@RequestParam("Like") String like) {
 		return heroService.getLength(like);
 	}
 
 	@GetMapping("/hero/getTop")
-	public List<HeroDashboard> getTopHeroHuman(@RequestParam("Race") String race) throws IOException, ClassNotFoundException {
+	public CompletableFuture<List<HeroDashboard>> getTopHeroHuman(@RequestParam("Race") String race) throws IOException, ClassNotFoundException {
 		return heroService.getTopHero(race);
 	}
 
 	@GetMapping("/hero/get/{heroId}")
-	public Hero getHero(@PathVariable Long heroId) throws JsonProcessingException {
+	public CompletableFuture<Hero> getHero(@PathVariable Long heroId) throws JsonProcessingException {
 		return heroService.getHero(heroId);
 	}
 
