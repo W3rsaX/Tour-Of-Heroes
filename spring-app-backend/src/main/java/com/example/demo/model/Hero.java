@@ -12,74 +12,77 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 @EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
 public class Hero {
 
-	@Id
-	@SequenceGenerator(name = "sequence_id_auto_gen", allocationSize = 100)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence_id_auto_gen")
-	private long id;
+  @Id
+  @SequenceGenerator(name = "sequence_id_auto_gen", allocationSize = 100)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence_id_auto_gen")
+  private long id;
 
-	@JsonProperty("name")
-	@Column(name = "name")
-	private String name;
+  @JsonProperty("name")
+  @Column(name = "name")
+  private String name;
 
-	@JsonProperty("gender")
-	@Column(name = "gender")
-	private String gender;
+  @JsonProperty("gender")
+  @Column(name = "gender")
+  private String gender;
 
-	@JsonProperty("power")
-	@Column(name = "power")
-	private int power;
+  @JsonProperty("power")
+  @Column(name = "power")
+  private int power;
 
-	@JsonProperty("race")
+  @JsonProperty("race")
 
-	@Column(name = "race")
-	private String race;
+  @Column(name = "race")
+  private String race;
 
-	public Hero(String name, String gender, int power, String race) {
-		this.name = name;
-		this.gender = gender;
-		this.power = power;
-		this.race = race;
-	}
+  public Hero(String name, String gender, int power, String race) {
+    this.name = name;
+    this.gender = gender;
+    this.power = power;
+    this.race = race;
+  }
 
-	public Hero() {
-		
-	}
+  public Hero() {
 
-	public long getId() {
-		return id;
-	}
+  }
 
-	@XmlElement(name = "name")
-	public String getName() {
-		return name;
-	}
+  public long getId() {
+    return id;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
-	@XmlElement(name = "gender")
-	public String getGender() {
-		return gender;
-	}
+  @XmlElement(name = "name")
+  public String getName() {
+    return name;
+  }
 
-	public void setGender(String gender) {
-		this.gender = gender;
-	}
-	@XmlElement(name = "power")
-	public int getPower() {
-		return power;
-	}
+  public void setName(String name) {
+    this.name = name;
+  }
 
-	public void setPower(int power) {
-		this.power = power;
-	}
-	@XmlElement(name = "race")
-	public String getRace() {
-		return race;
-	}
+  @XmlElement(name = "gender")
+  public String getGender() {
+    return gender;
+  }
 
-	public void setRace(String race) {
-		this.race = race;
-	}
+  public void setGender(String gender) {
+    this.gender = gender;
+  }
+
+  @XmlElement(name = "power")
+  public int getPower() {
+    return power;
+  }
+
+  public void setPower(int power) {
+    this.power = power;
+  }
+
+  @XmlElement(name = "race")
+  public String getRace() {
+    return race;
+  }
+
+  public void setRace(String race) {
+    this.race = race;
+  }
 
 }

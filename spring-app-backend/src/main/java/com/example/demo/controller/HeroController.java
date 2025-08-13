@@ -1,94 +1,144 @@
 package com.example.demo.controller;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
-import com.example.demo.model.HeroDashboard;
+import com.example.demo.model.Hero;
 import com.example.demo.service.HeroEditor;
+import com.example.demo.service.HeroService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.xml.bind.JAXBException;
+import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import com.example.demo.model.Hero;
-import com.example.demo.service.HeroService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @CrossOrigin("http://localhost:4200")
 public class HeroController {
 
-	@Autowired
-	private HeroService heroService;
-	@Autowired
-	private HeroEditor heroEditor;
+  @Autowired
+  private HeroService heroService;
+  @Autowired
+  private HeroEditor heroEditor;
 
-	@PostMapping("/hero/save")
-	public Hero saveHero(@RequestBody Hero hero) {
-		hero = heroEditor.firstUpper(hero);
-		hero = heroEditor.genderController(hero);
-		return heroService.saveHero(hero);
-	}
+  @PostMapping("/hero/save")
+  public ResponseEntity<?> saveHero(@RequestBody Hero hero) {
+    try {
+      hero = heroEditor.firstUpper(hero);
+      hero = heroEditor.genderController(hero);
+      heroService.saveHero(hero);
+      return new ResponseEntity<>(hero, HttpStatus.OK);
+    } catch (Exception e) {
+      return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
+    }
 
-	@PostMapping("/hero/save/file")
-	public void saveFile(@RequestBody MultipartFile file) throws IOException, JAXBException {
-		switch (file.getContentType()){
-			case ("text/csv"):
-				heroService.batchSaveHeroCSV(file);
-				break;
-			case ("application/json"):
-				heroService.batchSaveHeroJSON(file);
-				break;
-			case ("text/xml"):
-				heroService.batchSaveHeroXML(file);
-				break;
-		}
-	}
+  }
 
-	@GetMapping("/hero/get/file/csv")
-	public byte[] getCsv(@RequestParam("Like") String like) throws IOException {
-		return heroService.getCsv(like);
-	}
+  @PostMapping("/hero/save/file")
+  public ResponseEntity<?> saveFile(@RequestBody MultipartFile file)
+      throws IOException, JAXBException {
+    try {
+      switch (file.getContentType()) {
+        case ("text/csv"):
+          heroService.batchSaveHeroCSV(file);
+          break;
+        case ("application/json"):
+          heroService.batchSaveHeroJSON(file);
+          break;
+        case ("text/xml"):
+          heroService.batchSaveHeroXML(file);
+          break;
+        default:
+          return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+      }
+      return new ResponseEntity<>(HttpStatus.OK);
+    } catch (Exception e) {
+      return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
+    }
 
-	@GetMapping("/hero/get/file/json")
-	public byte[] getJson(@RequestParam("Like") String like) throws IOException {
-		return heroService.getJson(like);
-	}
+  }
 
-	@GetMapping("/hero/get/file/xml")
-	public byte[] getXml(@RequestParam("Like") String like) throws IOException, JAXBException {
-		return heroService.getXml(like);
-	}
+  @GetMapping("/hero/get/file/csv")
+  public ResponseEntity<?> getCsv(@RequestParam("Like") String like) throws IOException {
+    try {
+      return new ResponseEntity<>(heroService.getCsv(like), HttpStatus.OK);
+    } catch (Exception e) {
+      return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
+    }
+  }
 
-	@GetMapping("/hero/get")
-	public CompletableFuture<List<Hero>> getHeroes(@RequestParam("Sort") String sort, @RequestParam("SortType") String sortType, @RequestParam("FilterValue") String filterValue, @RequestParam("PageSize") Integer pageSize, @RequestParam("PageIndex") Integer pageIndex) {
-		return heroService.getHeroes(sort, sortType,filterValue, pageSize, pageIndex);
-	}
+  @GetMapping("/hero/get/file/json")
+  public ResponseEntity<?> getJson(@RequestParam("Like") String like) throws IOException {
+    try {
+      return new ResponseEntity<>(heroService.getJson(like), HttpStatus.OK);
+    } catch (Exception e) {
+      return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
+    }
 
-	@GetMapping("/hero/get/length")
-	public CompletableFuture<Long> getLength(@RequestParam("Like") String like) {
-		return heroService.getLength(like);
-	}
+  }
 
-	@GetMapping("/hero/getTop")
-	public CompletableFuture<List<HeroDashboard>> getTopHeroHuman(@RequestParam("Race") String race) throws IOException, ClassNotFoundException {
-		return heroService.getTopHero(race);
-	}
+  @GetMapping("/hero/get/file/xml")
+  public ResponseEntity<?> getXml(@RequestParam("Like") String like)
+      throws IOException, JAXBException {
+    try {
+      return new ResponseEntity<>(heroService.getXml(like), HttpStatus.OK);
+    } catch (Exception e) {
+      return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
+    }
+  }
 
-	@GetMapping("/hero/get/{heroId}")
-	public CompletableFuture<Hero> getHero(@PathVariable Long heroId) throws JsonProcessingException {
-		return heroService.getHero(heroId);
-	}
+  @GetMapping("/hero/get")
+  public CompletableFuture<ResponseEntity<?>> getHeroes(@RequestParam("SortCol") String sortCol,
+      @RequestParam("SortType") String sortType, @RequestParam("FilterValue") String filterValue,
+      @RequestParam("PageSize") Integer pageSize, @RequestParam("PageIndex") Integer pageIndex) {
+    return heroService.getHeroes(sortCol, sortType, filterValue, pageSize, pageIndex);
+  }
 
-	@DeleteMapping("/hero/delete/{heroId}")
-	public void deleteHero(@PathVariable Long heroId) {
-		heroService.deleteHero(heroId);
-	}
+  @GetMapping("/hero/get/length")
+  public CompletableFuture<ResponseEntity<?>> getLength(@RequestParam("Like") String like) {
+    return heroService.getLength(like);
+  }
 
-	@PutMapping("/hero/update")
-	public Hero updateHero(@RequestBody Hero hero) {
-		hero = heroEditor.firstUpper(hero);
-		hero = heroEditor.genderController(hero);
-		return heroService.updateHero(hero);
-	}
+  @GetMapping("/hero/getTop")
+  public CompletableFuture<ResponseEntity<?>> getTopHeroHuman(@RequestParam("Race") String race)
+      throws IOException, ClassNotFoundException {
+    return heroService.getTopHero(race);
+  }
+
+  @GetMapping("/hero/get/{heroId}")
+  public CompletableFuture<ResponseEntity<?>> getHero(@PathVariable Long heroId)
+      throws JsonProcessingException {
+    return heroService.getHero(heroId);
+  }
+
+  @DeleteMapping("/hero/delete/{heroId}")
+  public ResponseEntity<?> deleteHero(@PathVariable Long heroId) {
+    try {
+      heroService.deleteHero(heroId);
+      return new ResponseEntity<>(HttpStatus.OK);
+    } catch (Exception e) {
+      return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
+    }
+  }
+
+  @PutMapping("/hero/update")
+  public ResponseEntity<?> updateHero(@RequestBody Hero hero) {
+    try {
+      hero = heroEditor.firstUpper(hero);
+      hero = heroEditor.genderController(hero);
+      heroService.updateHero(hero);
+      return new ResponseEntity<>(HttpStatus.OK);
+    } catch (Exception e) {
+      return new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE);
+    }
+  }
 }
