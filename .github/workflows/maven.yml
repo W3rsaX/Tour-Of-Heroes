@@ -28,5 +28,5 @@ jobs:
         distribution: 'oracle'
         cache: maven
     - name: Build with Maven
-      run: mvn clean install
+      run: mvn -B package --file spring-app-backend/pom.xml
 
