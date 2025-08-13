@@ -10,20 +10,27 @@ import java.io.StringReader;
 
 @Controller
 public class FileParser {
-    public Hero convertCSV(String csv){
-        csv = csv.replace("\"", "");
-        String[] sSplit = csv.split("[.,:;]");
-        Hero hero = new Hero();
-        if (sSplit[0] != "name"){
-            hero = new Hero(sSplit[0], sSplit[1], Integer.parseInt(sSplit[2]),sSplit[3]);;
-        }
-        else return hero = null;
-        return hero;
-    }
 
-    public Heroes convertXML(String xml) throws JAXBException {
-        JAXBContext jaxbContext = JAXBContext.newInstance(Heroes.class);
-        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-        return (Heroes) jaxbUnmarshaller.unmarshal(new StringReader(xml));
+  public Hero convertCSV(String csv) {
+    try {
+      csv = csv.replace("\"", "");
+      String[] sSplit = csv.split("[.,:;]");
+      Hero hero = new Hero();
+      if (!sSplit[0].equals("name") && !sSplit[0].equals("")) {
+        hero = new Hero(sSplit[0], sSplit[1], Integer.parseInt(sSplit[2]), sSplit[3]);
+      } else {
+        return null;
+      }
+      return hero;
+    } catch (Exception e) {
+      System.err.println("Unexpected error: " + e.getMessage());
+      return null;
     }
+  }
+
+  public Heroes convertXML(String xml) throws JAXBException {
+    JAXBContext jaxbContext = JAXBContext.newInstance(Heroes.class);
+    Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+    return (Heroes) jaxbUnmarshaller.unmarshal(new StringReader(xml));
+  }
 }
