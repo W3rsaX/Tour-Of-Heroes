@@ -21,7 +21,7 @@ public class HeroGetAllE2ETest {
     params.put("SortCol", "Name");
     params.put("SortType", "asc");
     params.put("FilterValue", "");
-    params.put("PageSize", "100");
+    params.put("PageSize", "10");
     params.put("PageIndex", "1");
 
     Response responseGetAllHeroes = RestAssured
@@ -31,6 +31,7 @@ public class HeroGetAllE2ETest {
         .get("http://localhost:8080/hero/get")
         .andReturn();
 
+    System.out.println(responseGetAllHeroes.asString());
     String[] expectedFields = DataCreator.createExpectedHeraFieldesAll();
     Assertions.assertResponseCodeEquals(responseGetAllHeroes, 200);
     Assertions.assertJsonArrayHasFields(responseGetAllHeroes, expectedFields);
