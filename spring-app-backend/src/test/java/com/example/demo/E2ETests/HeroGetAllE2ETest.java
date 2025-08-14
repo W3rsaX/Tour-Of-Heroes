@@ -16,6 +16,7 @@ public class HeroGetAllE2ETest {
   @Test
   public void testGetAllHeroes(){
     Response responseSaveHero = Responses.responseSaveHero();
+    Assertions.assertResponseCodeEquals(responseSaveHero, 200);
 
     HashMap<String, String> params = new HashMap<>();
     params.put("SortCol", "Name");
@@ -31,7 +32,6 @@ public class HeroGetAllE2ETest {
         .get("http://localhost:8080/hero/get")
         .andReturn();
 
-    System.out.println(responseGetAllHeroes.asString());
     String[] expectedFields = DataCreator.createExpectedHeraFieldesAll();
     Assertions.assertResponseCodeEquals(responseGetAllHeroes, 200);
     Assertions.assertJsonArrayHasFields(responseGetAllHeroes, expectedFields);

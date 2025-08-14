@@ -15,6 +15,7 @@ public class HeroGetTopE2ETest {
   @Test
   public void testGetTopHeroes() {
     Response responseSaveHero = Responses.responseSaveHero();
+    Assertions.assertResponseCodeEquals(responseSaveHero, 200);
 
     Response responseGetTopHeroes = RestAssured
         .given()

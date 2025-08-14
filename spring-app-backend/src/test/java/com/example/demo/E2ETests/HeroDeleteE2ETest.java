@@ -22,8 +22,7 @@ public class HeroDeleteE2ETest {
     Response responseDeleteHero = RestAssured
         .delete("http://localhost:8080/hero/delete/" + id)
         .andReturn();
-
-    responseDeleteHero.getBody();
+    Assertions.assertResponseCodeEquals(responseDeleteHero, 200);
 
     responseGetHero = Responses.responseGetHero(id);
     Assertions.assertIsNull(responseGetHero);
