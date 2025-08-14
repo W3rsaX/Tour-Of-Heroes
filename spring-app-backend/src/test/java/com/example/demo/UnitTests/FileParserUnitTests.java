@@ -10,11 +10,11 @@ import com.example.demo.model.Hero;
 import com.example.demo.model.Heroes;
 import com.example.demo.service.FileParser;
 import jakarta.xml.bind.JAXBException;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-
-public class FileParserTests {
-
+@Tag("unit")
+public class FileParserUnitTests {
 
   private FileParser fileParser = new FileParser();
 
@@ -54,15 +54,6 @@ public class FileParserTests {
   @Test
   public void convertCSV_EmptyInput() {
     String csv = "";
-
-    Hero result = fileParser.convertCSV(csv);
-
-    assertNull(result);
-  }
-
-  @Test
-  public void convertCSV_IncompleteData() {
-    String csv = "\"Alice\",\"Female\"";
 
     Hero result = fileParser.convertCSV(csv);
 

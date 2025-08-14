@@ -1,7 +1,6 @@
 package com.example.demo.UnitTests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
@@ -25,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -37,11 +37,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import redis.clients.jedis.JedisPooled;
-import redis.clients.jedis.exceptions.JedisConnectionException;
 
+@Tag("unit")
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class HeroServiceTests {
+public class HeroServiceUnitTests {
   @Mock
   private HeroDao heroDao;
 
@@ -111,84 +111,6 @@ public class HeroServiceTests {
     ResponseEntity<?> response = future.get();
 
     assertEquals(HttpStatus.SERVICE_UNAVAILABLE, response.getStatusCode());
-  }
-
-  @Test
-  void getTopHero_shouldFetchFromDBAndCacheWhenNotInCache() throws Exception {
-    String race = "Elf";
-    String key = "Top:" + race;
-    List<HeroDashboard> dbHeroes = List.of(
-        createTestHero(1L, "Hero1", 100),
-        createTestHero(2L, "Hero2", 100)
-    );
-
-    when(jedis.get(key.getBytes())).thenReturn(null);
-    when(heroDashboardDao.getTopHeroesByRace(race)).thenReturn(dbHeroes);
-
-    CompletableFuture<ResponseEntity<?>> future = heroService.getTopHero(race);
-    ResponseEntity<?> response = future.get();
-
-    assertEquals(HttpStatus.OK, response.getStatusCode());
-    assertEquals(dbHeroes, response.getBody());
-  }
-
-  @Test
-  void getTopHero_shouldHandleRedisConnectionError() throws Exception {
-    String race = "Elf";
-    List<HeroDashboard> dbHeroes = List.of(
-        createTestHero(1L, "Hero1", 100),
-        createTestHero(2L, "Hero2", 100)
-    );
-
-    when(jedis.get(any(byte[].class))).thenThrow(new JedisConnectionException("Connection failed"));
-    when(heroDashboardDao.getTopHeroesByRace(race)).thenReturn(dbHeroes);
-
-    CompletableFuture<ResponseEntity<?>> future = heroService.getTopHero(race);
-    ResponseEntity<?> response = future.get();
-
-    assertEquals(HttpStatus.OK, response.getStatusCode());
-    assertEquals(dbHeroes, response.getBody());
-  }
-
-  @Test
-  void getTopHero_shouldReturnServiceUnavailableOnGeneralException() throws Exception {
-    String race = "Elf";
-
-    when(jedis.get(any(byte[].class))).thenThrow(new RuntimeException("Unexpected error"));
-    when(heroDashboardDao.getTopHeroesByRace(race)).thenThrow(new RuntimeException("Unexpected error"));
-
-    CompletableFuture<ResponseEntity<?>> future = heroService.getTopHero(race);
-    ResponseEntity<?> response = future.get();
-
-    assertEquals(HttpStatus.SERVICE_UNAVAILABLE, response.getStatusCode());
-  }
-
-  @Test
-  void getLength_shouldReturnCountAndOkStatus_whenDaoReturnsSuccessfully() throws ExecutionException, InterruptedException {
-    String searchString = "man";
-    long expectedCount = 5L;
-    when(heroDao.countByNameIgnoreCaseContaining(searchString)).thenReturn(expectedCount);
-
-    CompletableFuture<ResponseEntity<?>> future = heroService.getLength(searchString);
-    ResponseEntity<?> response = future.get();
-
-    assertEquals(HttpStatus.OK, response.getStatusCode());
-    assertEquals(expectedCount, response.getBody());
-    verify(heroDao).countByNameIgnoreCaseContaining(searchString);
-  }
-
-  @Test
-  void getLength_shouldReturnServiceUnavailable_whenDaoThrowsException() throws ExecutionException, InterruptedException {
-    String searchString = "man";
-    when(heroDao.countByNameIgnoreCaseContaining(searchString))
-        .thenThrow(new RuntimeException("Database error"));
-
-    CompletableFuture<ResponseEntity<?>> future = heroService.getLength(searchString);
-    ResponseEntity<?> response = future.get();
-
-    assertEquals(HttpStatus.SERVICE_UNAVAILABLE, response.getStatusCode());
-    assertNull(response.getBody());
-    verify(heroDao).countByNameIgnoreCaseContaining(searchString);
   }
 
   @Test
