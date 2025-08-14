@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -20,6 +21,8 @@ import com.opencsv.CSVWriter;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -37,6 +40,7 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 @Service
 public class HeroService {
 
+  private static final Logger log = LoggerFactory.getLogger(HeroService.class);
   @Autowired
   private HeroDao heroDao;
 
@@ -125,6 +129,7 @@ public class HeroService {
         final String key = "Hero:%d".formatted(heroId);
         String str = jedis.get(key);
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new Jdk8Module());
 
         if (str != null) {
           return CompletableFuture.completedFuture(
@@ -151,6 +156,7 @@ public class HeroService {
 
       return CompletableFuture.completedFuture(new ResponseEntity<>(hero, HttpStatus.OK));
     } catch (Exception e) {
+      System.err.println("Something wrong : " + e.getMessage());
       return CompletableFuture.completedFuture(
           new ResponseEntity<>(HttpStatus.SERVICE_UNAVAILABLE));
     }
@@ -171,7 +177,24 @@ public class HeroService {
 
   @Async
   public void deleteHero(Long heroId) {
-    heroDao.deleteById(heroId);
+    try {
+      heroDao.deleteById(heroId);
+    } catch (Exception e) {
+      System.err.println("PostgreSQL connection error : " + e.getMessage());
+    }
+
+    try (JedisPooled jedis = new JedisPooled("localhost", 6379)) {
+      final String key = "Hero:%d".formatted(heroId);
+      String str = jedis.get(key);
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.registerModule(new Jdk8Module());
+
+      if (str != null) {
+        jedis.del(key);
+      }
+    } catch (JedisConnectionException e) {
+      System.err.println("Redis connection error : " + e.getMessage());
+    }
   }
 
   @Async

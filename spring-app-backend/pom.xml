@@ -65,6 +65,11 @@
       <version>2.18.0</version>
     </dependency>
     <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jdk8</artifactId>
+      <version>2.18.0</version>
+    </dependency>
+    <dependency>
       <groupId>net.ttddyy</groupId>
       <artifactId>datasource-proxy</artifactId>
       <version>1.10</version>
