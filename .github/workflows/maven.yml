@@ -20,6 +20,7 @@ jobs:
           java-version: '23'
           distribution: 'oracle'
       - name: Run Unit Tests
+        working-directory: ./spring-app-backend
         run: mvn test -Dtest=**/*UnitTest* 
 
   integration-tests:
@@ -32,6 +33,7 @@ jobs:
           java-version: '23'
           distribution: 'oracle'
       - name: Run Integration Tests
+        working-directory: ./spring-app-backend
         run: mvn test -Dtest=**/*IntegrationTest*
 
   e2e-tests:
@@ -71,6 +73,7 @@ jobs:
           distribution: 'oracle'
 
       - name: Set up CI profile config
+        working-directory: ./spring-app-backend
         run: |
           cat <<EOF > src/main/resources/application-ci.properties
           spring.datasource.url=jdbc:postgresql://localhost:5432/testdb
@@ -81,6 +84,7 @@ jobs:
           EOF
           
       - name: Start Spring Boot app
+        working-directory: ./spring-app-backend
         run: |
           mvn spring-boot:run -Dspring-boot.run.profiles=ci &
           echo "Waiting for app to start..."
@@ -89,9 +93,11 @@ jobs:
           done
           
       - name: Run E2E Tests
+        working-directory: ./spring-app-backend
         run: mvn test -Dtest=**/*E2ETest* 
         
       - name: Stop Spring Boot app
+        working-directory: ./spring-app-backend
         run: |
           pkill -f "spring-boot:run" || echo "App already stopped"
           docker stop postgres redis || echo "Containers already stopped"
