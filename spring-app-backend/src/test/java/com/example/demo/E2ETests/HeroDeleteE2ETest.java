@@ -23,6 +23,8 @@ public class HeroDeleteE2ETest {
         .delete("http://localhost:8080/hero/delete/" + id)
         .andReturn();
 
+    responseDeleteHero.getBody();
+
     responseGetHero = Responses.responseGetHero(id);
     Assertions.assertIsNull(responseGetHero);
   }

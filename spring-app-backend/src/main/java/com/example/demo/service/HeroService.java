@@ -125,6 +125,7 @@ public class HeroService {
   public CompletableFuture<ResponseEntity<?>> getHero(Long heroId) throws JsonProcessingException {
     try {
       Optional<Hero> hero = Optional.empty();
+      System.out.println(hero);
       try (JedisPooled jedis = new JedisPooled("localhost", 6379)) {
         final String key = "Hero:%d".formatted(heroId);
         String str = jedis.get(key);
