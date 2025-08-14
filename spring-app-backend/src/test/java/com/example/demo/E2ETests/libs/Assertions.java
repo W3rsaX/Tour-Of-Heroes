@@ -17,7 +17,7 @@ public class Assertions {
     response.then().assertThat().body("$", hasKey(name));
 
     String value = response.jsonPath().getString(name);
-    assertEquals("JSON value is not equal to expected value", expectedAnswer, value);
+    assertEquals(expectedAnswer, value);
   }
 
   public static void assertJsonByNames(Response response, String[] name, String[] expectedAnswer) {
@@ -27,7 +27,7 @@ public class Assertions {
   }
 
   public static void assertIsNull(Response response) {
-    assertEquals("Answer is not null", "null", response.asString());
+    assertEquals("null", response.asString(), response.asString());
   }
 
   public static void assertJsonFiledIsNotNull(Response response, String name) {
