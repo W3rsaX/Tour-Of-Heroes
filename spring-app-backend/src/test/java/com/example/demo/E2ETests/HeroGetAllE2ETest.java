@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 @Tag("e2e")
-public class HeroGetE2ETest {
+public class HeroGetAllE2ETest {
 
   @Test
   public void testGetAllHeroes(){
