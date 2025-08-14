@@ -8,14 +8,14 @@ import java.util.List;
 @XmlRootElement(name = "heroes")
 public class Heroes {
 
-    List<Hero> heroes = new ArrayList<>();
+  List<Hero> heroes = new ArrayList<>();
 
-    @XmlElement(name = "hero")
-    public List<Hero> getHeroes() {
-        return heroes;
-    }
+  @XmlElement(name = "hero")
+  public List<Hero> getHeroes() {
+    return heroes;
+  }
 
-    public void setHeroes(List<Hero> heroes) {
-        this.heroes = heroes;
-    }
+  public void setHeroes(List<Hero> heroes) {
+    this.heroes = heroes;
+  }
 }

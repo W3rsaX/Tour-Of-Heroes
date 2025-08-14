@@ -6,46 +6,47 @@ import java.io.Serializable;
 @Entity
 @Table(name = "hero")
 public class HeroDashboard implements Serializable {
-    @Id
-    private long id;
 
-    @Column(name = "name")
-    private String name;
+  @Id
+  private long id;
 
-    @Column(name = "power")
-    private int power;
+  @Column(name = "name")
+  private String name;
 
-    public long getId() {
-        return id;
-    }
+  @Column(name = "power")
+  private int power;
 
-    public void setId(long id) {
-        this.id = id;
-    }
+  public long getId() {
+    return id;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public void setId(long id) {
+    this.id = id;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public int getPower() {
-        return power;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 
-    public void setPower(int power) {
-        this.power = power;
-    }
+  public int getPower() {
+    return power;
+  }
 
-    public HeroDashboard() {
+  public void setPower(int power) {
+    this.power = power;
+  }
 
-    }
+  public HeroDashboard() {
 
-    public HeroDashboard(long id, String name, int power) {
-        this.id = id;
-        this.name = name;
-        this.power = power;
-    }
+  }
+
+  public HeroDashboard(long id, String name, int power) {
+    this.id = id;
+    this.name = name;
+    this.power = power;
+  }
 }

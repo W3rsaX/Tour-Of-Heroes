@@ -9,9 +9,9 @@ import java.util.List;
 @Repository
 public interface HeroDao extends JpaRepository<Hero, Long> {
 
-	List<Hero> findAllByNameIgnoreCaseContaining(String like, PageRequest pageRequest);
+  List<Hero> findAllByNameIgnoreCaseContaining(String like, PageRequest pageRequest);
 
-	List<Hero> findAllByNameIgnoreCaseContaining(String like);
+  List<Hero> findAllByNameIgnoreCaseContaining(String like);
 
-	long countByNameIgnoreCaseContaining(String like);
+  long countByNameIgnoreCaseContaining(String like);
 }

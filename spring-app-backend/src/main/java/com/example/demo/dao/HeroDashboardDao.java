@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface HeroDashboardDao extends JpaRepository<HeroDashboard, Long> {
-    @Query(value = "SELECT id,name,power FROM hero WHERE race = ?1 ORDER BY power DESC LIMIT 1000", nativeQuery = true)
-    List<HeroDashboard> getTopHeroesByRace(String race);
+
+  @Query(value = "SELECT id,name,power FROM hero WHERE race = ?1 ORDER BY power DESC LIMIT 1000", nativeQuery = true)
+  List<HeroDashboard> getTopHeroesByRace(String race);
 }

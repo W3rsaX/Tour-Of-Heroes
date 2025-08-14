@@ -8,7 +8,7 @@ import java.util.List;
 @Repository
 public interface HeroJsonDao extends JpaRepository<HeroJson, Long> {
 
-    List<HeroJson> findAllByOrderByIdAsc();
+  List<HeroJson> findAllByOrderByIdAsc();
 
-    List<HeroJson> findAllByNameIgnoreCaseContaining(String like);
+  List<HeroJson> findAllByNameIgnoreCaseContaining(String like);
 }
