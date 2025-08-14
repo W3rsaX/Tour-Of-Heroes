@@ -4,9 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.example.demo.model.Hero;
 import com.example.demo.service.HeroEditor;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-public class HeroEditorTests {
+@Tag("unit")
+public class HeroEditorUnitTests {
 
   private final HeroEditor heroEditor = new HeroEditor();
 

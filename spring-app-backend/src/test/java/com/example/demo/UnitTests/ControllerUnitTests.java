@@ -13,6 +13,7 @@ import com.example.demo.service.HeroEditor;
 import com.example.demo.service.HeroService;
 import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,8 +24,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+@Tag("unit")
 @ExtendWith(MockitoExtension.class)
-public class ControllerTests {
+public class ControllerUnitTests {
 
   @Mock
   private HeroEditor heroEditor;
@@ -35,7 +37,6 @@ public class ControllerTests {
   @InjectMocks
   private HeroController heroController;
 
-//  SAVE HERO
   @Test
   public void saveHero_Success() {
     Hero hero = new Hero("Erich", "M", 99, "Elf");
@@ -63,7 +64,6 @@ public class ControllerTests {
     assertNull(response.getBody());
   }
 
-// SAVE HERO
   @Test
   public void saveFile_CSV_Success() throws IOException, JAXBException {
     MultipartFile file = new MockMultipartFile(
@@ -139,7 +139,7 @@ public class ControllerTests {
     assertEquals(HttpStatus.SERVICE_UNAVAILABLE, response.getStatusCode());
   }
 
-//  GET CSV
+
   @Test
   public void getCsv_Success() throws IOException {
     String csvData = "name,gender,age,race \nErich,M,99,Elf";
@@ -174,7 +174,6 @@ public class ControllerTests {
     assertNull(response.getBody());
   }
 
-//  GET JSON
   @Test
   public void getJson_Success() throws IOException {
     String jsonData = "[{\"name\":\"Erich\",\"gender\":\"M\",\"age\":99,\"race\":\"Elf\"}]";
@@ -208,7 +207,6 @@ public class ControllerTests {
     assertNull(response.getBody());
   }
 
-  //  GET XML
   @Test
   public void getXml_Success() throws IOException, JAXBException {
     String xmlData = "<heroes><hero><name>Erich</name><gender>M</gender><age>99</age><race>Elf</race></hero></heroes>";
@@ -252,7 +250,6 @@ public class ControllerTests {
     assertNull(response.getBody());
   }
 
-//  DELETE HERO
   @Test
   public void deleteHero_Success() {
     Long heroId = 1L;
@@ -282,7 +279,7 @@ public class ControllerTests {
 
     assertEquals(HttpStatus.SERVICE_UNAVAILABLE, response.getStatusCode());
   }
-//  UPDATE HERO
+
   @Test
   public void updateHero_Success() {
     Hero hero = new Hero("Erich", "M", 99, "Elf");

@@ -6,11 +6,13 @@ import com.example.demo.E2ETests.libs.Responses;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 
-public class HeroUpdateTest {
+@Tag("e2e")
+public class HeroUpdateE2ETest {
 
   @Test
   public void testUpdateHero() {

@@ -5,9 +5,11 @@ import com.example.demo.E2ETests.libs.Assertions;
 import com.example.demo.E2ETests.libs.DataCreator;
 import com.example.demo.E2ETests.libs.Responses;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-public class HeroSaveTest {
+@Tag("e2e")
+public class HeroSaveE2ETest {
 
   @Test
   public void testSaveHero() {
